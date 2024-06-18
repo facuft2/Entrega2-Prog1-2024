@@ -1,3 +1,5 @@
+{Se definen las siguientes constantes, todas de valor entero mayor que cero: MAXCOL = ...; MAXCAD = ...; cota de columnas de un archivo  cota de cadena de caracteres  Y los siguientes tipos de datos:  formato del texto  TipoFormato = ( Neg, Ita, Sub ); Formato = array [TipoFormato] of boolean; 3 uncarácterenuntextoincluyesuformato Caracter= record car:char; fmt:Formato end; arreglocontopequerepresentaaunalínea RangoColumna=1..MAXCOL; Linea = record cars: array[RangoColumna] ofCaracter; tope:0..MAXCOL end; PosibleLinea= record caseesLinea: boolean of true :(l:Linea); false:() end; listadelíneas,querepresentaauntexto Texto =ˆNodoLinea; NodoLinea = record info :Linea; sig :Texto end; posicióneneltexto Posicion = record linea :1..maxint; columna :RangoColumna end; PosiblePosicion= recordcase esPosicion: booleanof true :(p:Posicion); false:() end; PosibleColumna= recordcaseesColumna: boolean of true :(col:1..MAXCOL); false:() end; cadenadecaracteres Cadena = record cars: array[1..MAXCAD]of char; tope:0..MAXCAD end;}
+
 function todosTienenFormatoEnLinea ( tfmt : TipoFormato; ini, fin : RangoColumna
                                    ; ln : Linea ) : boolean;
 { Retorna true solo si todos los caracteres de `ln` entre las columnas `ini` y `fin`, 
@@ -5,8 +7,20 @@ function todosTienenFormatoEnLinea ( tfmt : TipoFormato; ini, fin : RangoColumna
 
   Precondiciones: 1 <= ini <= ln.tope
                   1 <= fin <= ln.tope }
-
+var
+  i: RangoColumna;
+  verify: boolean;
 begin
+  i := ini;
+  verify := true;
+  while (i <= fin) and verify do
+    begin
+      if not ln.cars[i].fmt[tfmt] then
+        verify := false;
+      i := i + 1;
+    end;
+
+  todosTienenFormatoEnLinea := verify;
 end;
 
 
@@ -19,7 +33,13 @@ procedure aplicarFormatoEnLinea ( tfmt : TipoFormato; ini, fin : RangoColumna
 
   Precondiciones: 1 <= ini <= ln.tope
                   1 <= fin <= ln.tope }
+var 
+    i: RangoColumna;
 begin
+  for i := ini to fin do
+    if ln.cars[i].fmt[tfmt] = true then
+      ln.cars[i].fmt[tfmt] := false
+    else ln.cars[i].fmt[tfmt] := true;
 end;
 
 
@@ -27,6 +47,8 @@ end;
 function contarCaracteresEnTexto ( txt : Texto ) : integer;
 { Retorna la cantidad de caracteres que tiene el texto `txt` }
 begin
+  // texto tomar linea leer de cada linea la cantidad de caracteres
+  // while txt.sig = 
 end;
 
 
