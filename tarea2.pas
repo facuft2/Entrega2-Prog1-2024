@@ -46,9 +46,23 @@ end;
 
 function contarCaracteresEnTexto ( txt : Texto ) : integer;
 { Retorna la cantidad de caracteres que tiene el texto `txt` }
+var
+    x,cantCar: Integer;
 begin
-  // texto tomar linea leer de cada linea la cantidad de caracteres
-  // while txt.sig = 
+  cantCar := 0;
+  while txt^.sig <> nil do
+  begin
+    for x := 1 to txt^.info.tope do
+      begin 
+        cantCar := cantCar + 1;
+      end;
+    txt := txt^.sig;
+  end;
+  for x := 1 to txt^.info.tope do
+      begin 
+        cantCar := cantCar + 1;
+      end;
+  contarCaracteresEnTexto := cantCar;
 end;
 
 
@@ -58,9 +72,49 @@ procedure buscarCadenaEnLineaDesde ( c : Cadena; ln : Linea; desde : RangoColumn
   columna `desde`. Si la encuentra, retorna en `pc` la columna en la que incia. 
 
   Precondiciones: 1 <= desde <= ln.tope }
-
+var
+    i,pcA,x: Integer;
+    igual,fin: Boolean; 
 begin
+  fin := false;
+  igual := false;
+  i := desde;
+
+  while (i <= ln.tope ) and not fin do
+  begin
+    x := 1;
+    if  ln.cars[i].car = c.cars[1]  then
+    begin
+      pcA := i;
+      igual := true;
+      while igual = true and (x <= c.tope) do
+      begin
+        if c.cars[x] = ln.cars[pcA].car then
+        begin
+          x += 1;
+          pcA += 1;
+        end
+        else
+        begin
+          igual := false;
+        end;
+      end;
+    end;
+    if igual = true then
+    begin
+      fin := igual;
+      pc.esColumna := true;
+      pc.col := i;
+    end;
+    i += 1;
+  end;
+  if igual = false then 
+  begin
+    pc.esColumna := false;
+  end;
+
 end;
+
 
 procedure buscarCadenaEnTextoDesde ( c : Cadena; txt : Texto; desde : Posicion
                                    ; var pp : PosiblePosicion );
@@ -69,8 +123,13 @@ procedure buscarCadenaEnTextoDesde ( c : Cadena; txt : Texto; desde : Posicion
   La búsqueda no encuentra cadenas que ocupen más de una línea.
 
   Precondiciones: 1 <= desde.linea <= cantidad de líneas 
-                  1 <= desde.columna <= tope de línea en desde.linea } 
+                  1 <= desde.columna <= tope de línea en desde.linea }
+var
+    // linea: Integer;
 begin
+
+// linea := desde.linea;
+
 end;
 
 
