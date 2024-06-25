@@ -125,10 +125,44 @@ procedure buscarCadenaEnTextoDesde ( c : Cadena; txt : Texto; desde : Posicion
   Precondiciones: 1 <= desde.linea <= cantidad de líneas 
                   1 <= desde.columna <= tope de línea en desde.linea }
 var
-    // linea: Integer;
+    i: Integer;
+    pc: PosibleColumna;
+    lin: Linea;
 begin
 
-// linea := desde.linea;
+  i := desde.linea;
+  while txt^.sig <> nil do
+  begin
+    if i = desde.linea then
+    begin
+      lin := txt^.info;
+      buscarCadenaEnLineaDesde(c,lin,desde.columna,pc);
+      if pc.esColumna = true then
+      begin
+        pp.esPosicion := true;
+        pp.p.linea := i;
+        pp.p.columna := pc.col;
+      end;
+    end; 
+    txt := txt^.sig;
+    i += 1;
+  end;
+  if i = desde.linea then
+  begin
+    lin := txt^.info;
+    buscarCadenaEnLineaDesde(c,lin,desde.columna,pc);
+    if pc.esColumna = true then
+    begin
+      pp.esPosicion := true;
+      pp.p.linea := i;
+      pp.p.columna := pc.col;
+    end;
+  end;
+  if pc.esColumna = false then
+  begin
+    pp.esPosicion := false;
+  end;
+
 
 end;
 
@@ -146,7 +180,42 @@ procedure insertarCadenaEnLinea ( c : Cadena; columna : RangoColumna
   Precondiciones:  1 <= columna <= ln.tope+1
                    columna <= MAXCOL
                    c.tope + columna <= MAXCOL  }  
+var
+    i: Integer;
 begin
+
+if ln.tope + c.tope <= MAXCOL then
+begin
+  for i := ln.tope downto columna do
+  begin
+    ln.cars[i+c.tope] := ln.cars[i];
+  end;
+
+  for i := 1 to c.tope do
+  begin
+    ln.cars[columna].car := c.cars[i];
+    columna += 1;
+  end;
+
+  ln.tope := ln.tope + c.tope;
+end
+else
+begin
+  pln.esLinea := true;
+  pln.l.tope := 0;
+  for i := columna to ln.tope do
+  begin
+    pln.l.tope += 1;
+    pln.l.cars[pln.l.tope] := ln.cars[i];
+  end;
+  for i := 1 to c.tope do
+  begin
+    pln.l.tope += 1;
+    pln.l.cars[pln.l.tope].car := c.cars[i];
+  end;
+  ln.tope := columna - 1;
+end;
+
 end;
 
 
@@ -155,5 +224,27 @@ procedure insertarLineaEnTexto ( ln : Linea; nln : integer; var txt : Texto );
 
   Precondiciones: 1 < nln <= cantidad de líneas del texto + 1
 }
+var
+  temp, nuevo: Texto; // Se introduce un puntero temporal y uno para el nuevo nodo
 begin
+  if nln = 1 then
+  begin
+    new(nuevo); // Se crea un nuevo nodo
+    nuevo^.info := ln; // Se asigna la línea al nuevo nodo
+    nuevo^.sig := txt; // El siguiente del nuevo nodo apunta al inicio actual de la lista
+    txt := nuevo; // El inicio de la lista ahora es el nuevo nodo
+  end
+  else
+  begin
+    temp := txt; // Se inicia el puntero temporal al inicio de la lista
+    while nln > 2 do
+    begin
+      temp := temp^.sig; // Se avanza el puntero temporal hasta el nodo anterior al punto de inserción
+      nln -= 1;
+    end;
+    new(nuevo); // Se crea un nuevo nodo para la línea a insertar
+    nuevo^.info := ln; // Se asigna la línea al nuevo nodo
+    nuevo^.sig := temp^.sig; // El nuevo nodo apunta al siguiente del nodo temporal
+    temp^.sig := nuevo; // El siguiente del nodo temporal ahora es el nuevo nodo
+  end;
 end;
