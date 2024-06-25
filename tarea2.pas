@@ -35,9 +35,10 @@ procedure aplicarFormatoEnLinea ( tfmt : TipoFormato; ini, fin : RangoColumna
                   1 <= fin <= ln.tope }
 var 
     i: RangoColumna;
+    aplicar: Boolean;
 begin
   for i := ini to fin do
-    if ln.cars[i].fmt[tfmt] = true then
+    if ln.cars[i].fmt[tfmt] then
       ln.cars[i].fmt[tfmt] := false
     else ln.cars[i].fmt[tfmt] := true;
 end;
@@ -115,6 +116,65 @@ begin
 
 end;
 
+procedure buscarCadenaEnTextoDesde ( c : Cadena; txt : Texto; desde : Posicion
+                                   ; var pp : PosiblePosicion );
+{ Busca la primera ocurrencia de la cadena `c` en el texto `txt` a partir de la 
+  posición `desde`. Si la encuentra, retorna en `pp` la posición en la que incia. 
+  La búsqueda no encuentra cadenas que ocupen más de una línea.
+
+  Precondiciones: 1 <= desde.linea <= cantidad de líneas 
+                  1 <= desde.columna <= tope de línea en desde.linea
+function ubicarLineaEnTexto ( txt: Texto; nln: integer ) : Texto;
+                   }
+var
+    i: Integer;
+    pc: PosibleColumna;
+    linActual: Linea;
+begin
+  i := desde.linea;
+  pp.esColumna := false;
+  linActual := buscarCadenaEnLineaDesde(txt,desde.linea);
+
+  if linActual <> nil then
+  begin
+    while linActual <> nil do
+    begin
+      if i = desde.linea then
+      begin
+        lin := txt^.info;
+        
+        if pc.esColumna = true then
+        begin
+          pp.esPosicion := true;
+          pp.p.linea := i;
+          pp.p.columna := pc.col;
+        end;
+      end; 
+      txt := txt^.sig;
+      i += 1;
+    end;
+    if i = desde.linea then
+    begin
+      lin := txt^.info;
+      buscarCadenaEnLineaDesde(c,lin,desde.columna,pc);
+      if pc.esColumna = true then
+      begin
+        pp.esPosicion := true;
+        pp.p.linea := i;
+        pp.p.columna := pc.col;
+      end;
+    end;
+    if pc.esColumna = false then
+    begin
+      pp.esPosicion := false;
+    end;
+
+  end;
+
+end;
+
+
+
 
 procedure buscarCadenaEnTextoDesde ( c : Cadena; txt : Texto; desde : Posicion
                                    ; var pp : PosiblePosicion );
@@ -190,6 +250,11 @@ begin
   begin
     ln.cars[i+c.tope] := ln.cars[i];
   end;
+
+  ln.cars[columna].fmt[Neg] := False;
+  ln.cars[columna].fmt[Ita] := False;
+  ln.cars[columna].fmt[Sub] := False;
+
 
   for i := 1 to c.tope do
   begin
